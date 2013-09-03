@@ -1,0 +1,32 @@
+#
+# Cookbook Name:: cache-warmer
+# Recipe:: default
+#
+# Copyright 2013, AT&T
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+include_recipe "openstack-base::#{chef_environment}"
+
+node["openstack"]["image"]["upload_images"].each do |img|
+  cache_warmer_image "Prefetching #{img.to_s}" do
+    image_name img
+    identity_user service_user
+    identity_pass service_pass
+    identity_tenant service_tenant_name
+    identity_uri auth_uri
+
+    action :prefetch
+  end
+end
